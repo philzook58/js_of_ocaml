@@ -302,7 +302,7 @@ let check_primitive ~name pi ~code ~requires =
         noise *)
   then
     warn
-      "warning: %s: 'joo_global_object' is being deprecated, please sue `globalThis` \
+      "warning: %s: 'joo_global_object' is being deprecated, please use `globalThis` \
        instead@."
       (loc pi);
   let freename = StringSet.remove Constant.old_global_object freename in
