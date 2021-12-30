@@ -331,20 +331,6 @@ let pack ~global ~standalone { Linker.runtime_code = js; always_required_codes }
   if times () then Format.eprintf "Start Optimizing js...@.";
   (* pre pack optim *)
   let js =
-    let o = new Js_traverse.free in
-    let js = o#program js in
-    if StringSet.mem Constant.old_global_object o#get_free_name
-    then
-      ( J.Statement
-          (J.Variable_statement
-             [ ( J.ident Constant.old_global_object
-               , Some (J.EVar (J.ident global_object), J.N) )
-             ])
-      , J.N )
-      :: js
-    else js
-  in
-  let js =
     if Config.Flag.share_constant ()
     then (
       let t1 = Timer.make () in
@@ -369,6 +355,20 @@ let pack ~global ~standalone { Linker.runtime_code = js; always_required_codes }
     else js
   in
   let wrap_in_iifa ~can_use_strict js =
+    let js =
+      let o = new Js_traverse.free in
+      let js = o#program js in
+      if StringSet.mem Constant.old_global_object o#get_free_name
+      then
+        ( J.Statement
+            (J.Variable_statement
+               [ ( J.ident Constant.old_global_object
+                 , Some (J.EVar (J.ident global_object), J.N) )
+               ])
+        , J.N )
+        :: js
+      else js
+    in
     let f =
       J.EFun (None, [ J.ident global_object ], use_strict js ~can_use_strict, J.U)
     in
